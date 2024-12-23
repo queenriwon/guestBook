@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방명록</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <style>
+    
+        .guestbook-main{
+            padding: 20px;
+            background-color: green;
+        }
+        .guestbook-posting{
+            display: flex;
+            flex-direction: row; 
+        }
+
+        .guestbook-postingbox{
+            width: 80%;
+            margin-top: 14px;
+        }
+
+        
+        .guestbook-postingbtn{
+            justify-content: center; /* 수평 가운데 정렬 */    
+            margin: auto ;         /* 왼쪽과 오른쪽에 자동 여백 */
+            padding: auto;
+
+        }
+        .guestbook-postingbutton{
+            padding: 50px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div>
+
+        <div class="guestbook-main">
+            <div class="guestbook-posting">
+                <div class="guestbook-postingbox" id="postingbox">
+                    <div class="form-floating mb-3">
+                        <input type="nickname" class="form-control" id="nickname" placeholder="닉네임">
+                        <label for="floatingInput">닉네임</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="content" class="form-control" id="content" placeholder="방명록">
+                        <label for="floatingInput">방명록</label>
+                    </div>
+                </div>
+                <div class="guestbook-postingbtn">
+                    <button type="button" class="btn btn-outline-primary guestbook-postingbutton">Primary</button>        
+                </div>
+            </div>
+            <div class="guestbook-list">
+
+            </div>
+        </div>
+
+    </div>
+    
+
+    
+</body>
+</html>
