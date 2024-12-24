@@ -13,18 +13,16 @@
     
         .guestbook-main{
             padding: 20px;
-            background-color: green;
         }
         .guestbook-posting{
             display: flex;
-            flex-direction: row; 
+            flex-direction: row;
         }
 
         .guestbook-postingbox{
             width: 80%;
             margin-top: 14px;
         }
-
         
         .guestbook-postingbtn{
             justify-content: center; /* 수평 가운데 정렬 */    
@@ -33,7 +31,50 @@
 
         }
         .guestbook-postingbutton{
-            padding: 50px;
+            margin:auto;
+            padding: 40px;
+        }
+        .guestbook-repleimage{
+            height: 80px;
+            width: 80px;
+            border-radius: 50%;
+        }
+
+        .guestbook-listrow{
+            display: flex;
+            flex-direction: row;
+            background-color: lightgray;
+            padding: 20px 20px 0px 20px;
+            border-radius: 10px;
+        }
+        .guestbook-listcolumn{
+            display: flex;
+            flex-direction: column;
+            height: 150px;
+            margin-left: 20px;
+            margin-top: 5px;
+            flex-grow: 1;
+
+        }
+        .guestbook-listcolumn > p{
+            height: 50%;
+            padding-top: 20px;
+            padding-left: 10px;
+            flex-grow: 1;
+            border-top: 2px solid white;
+
+        }
+
+        .guestbook-listcolumn > div{
+            display: flex;
+            flex-direction: row;
+            gap: 80px;
+            margin-left: 10px;
+        }
+
+        .guestbook-listcolumn > div > p {
+            font-size: 15px;
+            color: #777777;
         }
 
     </style>
@@ -59,6 +100,17 @@
                 </div>
             </div>
             <div class="guestbook-list">
+                <div class="guestbook-listrow">
+                    <img src="https://mblogthumb-phinf.pstatic.net/MjAyMDExMDFfMTY0/MDAxNjA0MjI4ODc1MDgx.20zY0e0fjnqLYvyFxN2FuZl75yr0p-lejDrTdLzRargg.aDqPo9fsnwOujN45rK3vW-dUi2usn0wBwQE8xmstEBUg.JPEG.gambasg/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EA%B8%B0%EB%B3%B8%ED%94%84%EB%A1%9C%ED%95%84_%EA%B0%88%EC%83%89.jpg?type=w400" class="img-thumbnail guestbook-repleimage" alt="...">
+                    <div class="guestbook-listcolumn">
+                        <div>
+                            <h5 class="mt-0">닉네임</h5>
+                            <p> 날짜 </p>
+                        </div>
+                        <p>방명록 내용</p>
+                    </div>
+                    
+                </div>
 
             </div>
         </div>
