@@ -84,25 +84,35 @@
         }
 
         .guestbook-deleteBtn {
-            margin-left: auto;
             font-size: 14px;
             color: gray;
-            /* 텍스트 색상 */
         }
 
         .guestbook-deleteBtn:hover {
             color: darkred;
-            /* hover 시 색상 변화 */
             text-decoration: underline;
-            /* 밑줄 추가 */
             outline: none;
         }
 
         .guestbook-deleteBtn:focus {
             outline: none;
-            /* 포커스 시에도 파란색 라인 제거 */
             box-shadow: none;
-            /* 포커스 시 그림자도 제거 */
+        }
+
+        .guestbook-correctionBtn {
+            font-size: 14px;
+            color: gray;
+        }
+
+        .guestbook-correctionBtn:hover {
+            color: darkred;
+            text-decoration: underline;
+            outline: none;
+        }
+
+        .guestbook-correctionBtn:focus {
+            outline: none;
+            box-shadow: none;
         }
     </style>
 
@@ -112,7 +122,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
@@ -137,6 +147,7 @@
 
             let nickname = $('#nickname').val();
             let content = $('#content').val();
+            let password = $('#password').val();
             let now = new Date();
             let localDateTime = now.toLocaleString();
 
@@ -146,7 +157,8 @@
                 let doc = {
                     'nickname': nickname,
                     'content': content,
-                    'datetime': localDateTime
+                    'datetime': localDateTime,
+                    'password': password
                 };
                 await addDoc(collection(db, `guestBook/${user}/entries`), doc);
                 alert('방명록이 작성되었습니다!');
@@ -169,9 +181,19 @@
                 <img src="https://mblogthumb-phinf.pstatic.net/MjAyMDExMDFfMTY0/MDAxNjA0MjI4ODc1MDgx.20zY0e0fjnqLYvyFxN2FuZl75yr0p-lejDrTdLzRargg.aDqPo9fsnwOujN45rK3vW-dUi2usn0wBwQE8xmstEBUg.JPEG.gambasg/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EA%B8%B0%EB%B3%B8%ED%94%84%EB%A1%9C%ED%95%84_%EA%B0%88%EC%83%89.jpg?type=w400"
                     class="img-thumbnail guestbook-repleimage" alt="...">
                 <div class="guestbook-listcolumn">
-                    <div>
+                    <div style="display: flex; align-items: center;">
                         <h6 class="mt-0">${nickname}</h6>
-                        <button class="btn guestbook-deleteBtn" id="deleteButton" data-id="${id}">삭제</button>
+                        <div style="display: flex; margin-left: auto; align-items: center; gap:5px;">
+                            <div class="form-floating mb-3 style="margin-left: auto;">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-auto">
+                                        <input type="password" id="userPassword" class="form-control" aria-describedby="passwordHelpInline">
+                                    </div>
+                                </div>                            
+                            </div>
+                            <button class="btn guestbook-correctionBtn" id="correctionButton" data-id="${id}">수정</button>
+                            <button class="btn guestbook-deleteBtn" id="deleteButton" data-id="${id}">삭제</button>
+                        </div>
                     </div>
                     <p class="guestbook-listcontent">${content}</p>
                     <p class="guestbook-listdatetime">${datetime}</p>
@@ -185,20 +207,102 @@
 
 
         //삭제 코드
-        $("#deleteButton").click(async function () {
+        $(document).on('click', '.guestbook-deleteBtn', async function () {
             const commentId = $(this).data("id");
+            const passwordUser = $('#userPassword').val();
+
+            // 삭제 확인
+            const userConfirmed = confirm("정말로 이 댓글을 삭제하시겠습니까?");
+            if (!userConfirmed) {
+                return;
+            }
+
+            const docRef = doc(db, `guestBook/${user}/entries`, commentId);
+
             try {
-                // Firebase에서 해당 댓글 삭제
-                await deleteDoc(doc(db, `guestBook/${user}/entries`, commentId));
-                // 삭제 후 해당 댓글을 DOM에서 제거
-                $(`#comment-${commentId}`).remove();
-                alert('댓글이 삭제되었습니다!');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    let row = docSnap.data();
+                    let password = row['password'];
+
+                    // 비밀번호가 일치하는지 확인
+                    if (password !== passwordUser) {
+                        alert('비밀번호가 올바르지 않습니다.');
+                        return;
+                    }
+
+                    // 비밀번호가 맞으면 댓글 삭제
+                    await deleteDoc(docRef);
+                    $(`#comment-${commentId}`).remove();  // DOM에서 삭제
+                    alert('댓글이 삭제되었습니다!');
+                } else {
+                    alert("댓글을 찾을 수 없습니다.");
+                }
             } catch (error) {
                 console.error("댓글 삭제 실패:", error);
                 alert('댓글 삭제에 실패했습니다.');
             }
-
         });
+
+        $(document).on('click', '.guestbook-correctionBtn', async function () {
+            const commentId = $(this).data("id");  // 수정하려는 댓글의 ID를 가져옵니다.
+            const passwordUser = $('#userPassword').val();  // 사용자로부터 입력된 비밀번호
+
+            // Firebase에서 해당 댓글 데이터 가져오기
+            const docRef = doc(db, `guestBook/${user}/entries`, commentId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                let row = docSnap.data();
+                let password = row['password'];
+
+                // 비밀번호 확인
+                if (password !== passwordUser) {
+                    alert('비밀번호가 올바르지 않습니다.');
+                    return;
+                }
+
+                let nickname = row['nickname'];
+                let content = row['content'];
+                let datetime = row['datetime'];
+
+                $('#nickname').val(nickname);
+                $('#content').val(content);
+                $('#password').val(password); 
+
+
+                //수정시 작성버튼(업로드 내용과 비슷하나 updateDoc을 사용)
+                $('#guestbook-postingbutton').off('click').on('click', async function () {
+                    let newNickname = $('#nickname').val();
+                    let newContent = $('#content').val();
+                    let newPassword = $('#password').val();
+                    let now = new Date();
+                    let localDateTime = now.toLocaleString();
+
+                    if (newNickname === '' || newContent === '') {
+                        alert('닉네임과 방명록 내용을 써주세요.');
+                    } else {
+                        let updatedDoc = {
+                            'nickname': newNickname,
+                            'content': newContent,
+                            'datetime': localDateTime,
+                            'password': newPassword
+                        };
+
+                       
+                        await updateDoc(docRef, updatedDoc);
+                        alert('방명록이 수정되었습니다!');
+                        window.location.reload();
+                    }
+                });
+            } else {
+                alert("댓글을 찾을 수 없습니다.");
+            }
+        });
+
+
+
+
 
     </script>
 
@@ -218,6 +322,10 @@
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="content" placeholder="방명록">
                         <label for="content">방명록</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="password" maxlength="8" placeholder="비밀번호">
+                        <label for="password">비밀번호(최대8자)</label>
                     </div>
                 </div>
                 <div class="guestbook-postingbtn">
