@@ -1,24 +1,234 @@
-<div>
-    <div class="guestbook-main">
-        <div class="guestbook-posting">
-            <div class="guestbook-postingbox" id="postingbox">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="nickname" placeholder="닉네임">
-                    <label for="nickname">닉네임</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="content" placeholder="방명록">
-                    <label for="content">방명록</label>
-                </div>
-            </div>
-            <div class="guestbook-postingbtn">
-                <button type="button" class="btn btn-outline-primary guestbook-postingbutton"
-                    id="guestbook-postingbutton">작성</button>
-            </div>
-        </div>
-        <div class="guestbook-list" id="guestbook-list">
-            <!-- 추가되는 곳 -->
-        </div>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방명록</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        .guestbook-posting {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .guestbook-postingbox {
+            width: 80%;
+            margin-top: 14px;
+        }
+
+        .guestbook-postingbtn {
+            justify-content: center;
+            margin: auto;
+            padding: auto;
+
+        }
+
+        .guestbook-postingbutton {
+            margin: auto;
+            padding: 40px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .guestbook-repleimage {
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+        }
+
+        .guestbook-list {
+            gap: 20px;
+        }
+
+        .guestbook-listrow {
+            display: flex;
+            flex-direction: row;
+            background-color: #eeeeee;
+            padding: 20px 20px 0px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .guestbook-listcolumn {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+            margin-top: 5px;
+            flex-grow: 1;
+
+        }
+
+        .guestbook-listcontent {
+            padding-top: 10px;
+            padding-left: 5px;
+            flex-grow: 1;
+            border-top: 2px solid white;
+
+        }
+
+        .guestbook-listcolumn>div {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-left: 5px;
+        }
+
+        .guestbook-listdatetime {
+            font-size: 12px;
+            color: #777777;
+        }
+
+        .guestbook-deleteBtn {
+            margin-left: auto;
+            font-size: 14px;
+            color: gray;
+            /* 텍스트 색상 */
+        }
+
+        .guestbook-deleteBtn:hover {
+            color: darkred;
+            /* hover 시 색상 변화 */
+            text-decoration: underline;
+            /* 밑줄 추가 */
+            outline: none;
+        }
+
+        .guestbook-deleteBtn:focus {
+            outline: none;
+            /* 포커스 시에도 파란색 라인 제거 */
+            box-shadow: none;
+            /* 포커스 시 그림자도 제거 */
+        }
+    </style>
+
+
+    <script type="module">
+        // Firebase SDK 라이브러리 가져오기
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+        // Firebase 구성 정보 설정
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDrR7VoWYioSlzxW3S5qZAAsQbxrbBhlg",
+            authDomain: "project-introduce.firebaseapp.com",
+            projectId: "project-introduce",
+            storageBucket: "project-introduce.firebasestorage.app",
+            messagingSenderId: "830703425483",
+            appId: "1:830703425483:web:c05b7c3072112a857e084e",
+            measurementId: "G-1SCXC4PL64"
+        };
+
+        let user = $('#name').text();
+        // Firebase 인스턴스 초기화
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        $("#guestbook-postingbutton").click(async function () {
+
+            let nickname = $('#nickname').val();
+            let content = $('#content').val();
+            let now = new Date();
+            let localDateTime = now.toLocaleString();
+
+            if (nickname === '' || content === '') {
+                alert('닉네임과 방명록 내용을 써주세요.');
+            } else {
+                let doc = {
+                    'nickname': nickname,
+                    'content': content,
+                    'datetime': localDateTime
+                };
+                await addDoc(collection(db, `guestBook/${user}/entries`), doc);
+                alert('방명록이 작성되었습니다!');
+                window.location.reload();
+            }
+        });
+
+
+        let docs = await getDocs(collection(db, `guestBook/${user}/entries`));
+        docs.forEach((doc) => {
+            let row = doc.data();
+            console.log(row);
+
+            let nickname = row['nickname'];
+            let content = row['content'];
+            let datetime = row['datetime'];
+            let id = doc.id;
+
+            let temp_guestbook = `<div class="guestbook-listrow" id="comment-${id}">
+                <img src="https://mblogthumb-phinf.pstatic.net/MjAyMDExMDFfMTY0/MDAxNjA0MjI4ODc1MDgx.20zY0e0fjnqLYvyFxN2FuZl75yr0p-lejDrTdLzRargg.aDqPo9fsnwOujN45rK3vW-dUi2usn0wBwQE8xmstEBUg.JPEG.gambasg/%EC%9C%A0%ED%8A%9C%EB%B8%8C_%EA%B8%B0%EB%B3%B8%ED%94%84%EB%A1%9C%ED%95%84_%EA%B0%88%EC%83%89.jpg?type=w400"
+                    class="img-thumbnail guestbook-repleimage" alt="...">
+                <div class="guestbook-listcolumn">
+                    <div>
+                        <h6 class="mt-0">${nickname}</h6>
+                        <button class="btn guestbook-deleteBtn" id="deleteButton" data-id="${id}">삭제</button>
+                    </div>
+                    <p class="guestbook-listcontent">${content}</p>
+                    <p class="guestbook-listdatetime">${datetime}</p>
+                </div>
+
+            </div>`
+
+            $('#guestbook-list').append(temp_guestbook);
+
+        });
+
+
+        //삭제 코드
+        $("#deleteButton").click(async function () {
+            const commentId = $(this).data("id");
+            try {
+                // Firebase에서 해당 댓글 삭제
+                await deleteDoc(doc(db, `guestBook/${user}/entries`, commentId));
+                // 삭제 후 해당 댓글을 DOM에서 제거
+                $(`#comment-${commentId}`).remove();
+                alert('댓글이 삭제되었습니다!');
+            } catch (error) {
+                console.error("댓글 삭제 실패:", error);
+                alert('댓글 삭제에 실패했습니다.');
+            }
+
+        });
+
+    </script>
+
+</head>
+
+<body>
+
+    <div>
+        <h1 id="name">이지은</h1>
+        <div class="guestbook-main">
+            <div class="guestbook-posting">
+                <div class="guestbook-postingbox" id="postingbox">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="nickname" placeholder="닉네임">
+                        <label for="nickname">닉네임</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="content" placeholder="방명록">
+                        <label for="content">방명록</label>
+                    </div>
+                </div>
+                <div class="guestbook-postingbtn">
+                    <button type="button" class="btn btn-outline-primary guestbook-postingbutton"
+                        id="guestbook-postingbutton">작성</button>
+                </div>
+            </div>
+            <div class="guestbook-list" id="guestbook-list">
+                <!-- 추가되는 곳 -->
+            </div>
+
+        </div>
     </div>
-</div>
+</body>
