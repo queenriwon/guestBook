@@ -196,7 +196,7 @@
                             <div class="form-floating mb-3 style="margin-left: auto;">
                                 <div class="row g-3 align-items-center">
                                     <div class="col-auto">
-                                        <input type="password" id="userPassword" class="form-control" aria-describedby="passwordHelpInline">
+                                        <input type="password" class="user-password" data-id="${id}" class="form-control" aria-describedby="passwordHelpInline">
                                     </div>
                                 </div>                            
                             </div>
@@ -216,19 +216,19 @@
 
 
         //삭제 코드
-        $(document).on('click', '.guestbook-deleteBtn', async function () {
-            const commentId = $(this).data("id");
-            const passwordUser = $('#userPassword').val();
+        $(document).on('click', '.guestbook-deleteBtn', async function () { 
+            const commentId = $(this).data("id"); 
+            const passwordUser = $(`.user-password[data-id='${commentId}']`).val();
+
+            const docRef = doc(db, `guestBook/${user}/entries`, commentId);
+            const docSnap = await getDoc(docRef);
 
             // 삭제 확인
-            const userConfirmed = confirm("정말로 이 댓글을 삭제하시겠습니까?");
+            const userConfirmed = confirm("정말로 이 방명록을 삭제하시겠습니까?");
             if (!userConfirmed) {
                 return;
             }
 
-            const docRef = doc(db, `guestBook/${user}/entries`, commentId);
-
-            const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 let row = docSnap.data();
                 let password = row['password'];
@@ -246,9 +246,11 @@
             }
         });
 
+        
+
         $(document).on('click', '.guestbook-correctionBtn', async function () {
             const commentId = $(this).data("id");
-            const passwordUser = $('#userPassword').val();
+            const passwordUser = $(`.user-password[data-id='${commentId}']`).val();
 
             const docRef = doc(db, `guestBook/${user}/entries`, commentId);
             const docSnap = await getDoc(docRef);
@@ -294,11 +296,6 @@
                 }
             });
         });
-
-
-
-
-
     </script>
 
 </head>
@@ -342,3 +339,9 @@
         </div>
     </div>
 </body>
+
+
+
+
+
+
