@@ -233,15 +233,13 @@
                 let row = docSnap.data();
                 let password = row['password'];
 
-                // 비밀번호가 일치하는지 확인
                 if (password !== passwordUser) {
                     alert('비밀번호가 올바르지 않습니다.');
                     return;
                 }
 
-                // 비밀번호가 맞으면 댓글 삭제
                 await deleteDoc(docRef);
-                $(`#comment-${commentId}`).remove();  // DOM에서 삭제
+                $(`#comment-${commentId}`).remove();
                 alert('댓글이 삭제되었습니다!');
             } else {
                 alert("댓글을 찾을 수 없습니다.");
